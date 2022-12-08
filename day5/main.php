@@ -39,6 +39,12 @@ for (end($stackLines); key($stackLines)!==null; prev($stackLines)){
     }
 }
 
+// Create copy of stacks
+$stacksCopy = [];
+foreach ($stacks as $id => $stack) {
+    $stacksCopy[$id] = array_merge([], $stack);
+}
+
 // Read remaining lines. These are the commands
 while (($line = fgets($handle)) !== false) {
     // Remove newline
@@ -57,19 +63,34 @@ while (($line = fgets($handle)) !== false) {
     $from = $parts[1];
     $to = $parts[2];
 
-    // Move the characters
+    // Move the characters to solve part 1
     for ($i = 0; $i < $amount; $i++) {
         $char = array_pop($stacks[$from]);
         array_push($stacks[$to], $char);
     }
+
+    // Move the characters to solve part 2
+
+    # Remove the characters from the from stack
+    $slice = array_splice($stacksCopy[$from], -$amount);
+    # Add the characters to the to stack in the same order (add slice to end of array)
+    $stacksCopy[$to] = array_merge($stacksCopy[$to], $slice);
 }
 
 # Done reading file
 fclose($handle);
 
+echo("Part 1: ");
 // Print top of each stack
 foreach ($stacks as $id => $stack) {
     echo array_pop($stack);
 }
+echo("\n");
+
+echo("Part 2: ");
+foreach ($stacksCopy as $id => $stack) {
+    echo array_pop($stack);
+}
+echo("\n");
 
 ?>
