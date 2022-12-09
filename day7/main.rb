@@ -106,19 +106,10 @@ def create_tree_from_input()
     return $root;
 end
 
-@sizes = 0;
-
-def print_tree(node, level)
+# Pretty print tree like shown in example
+def print_tree(node, level = 0)
     # Print node name, type and size if file
     puts "  " * (level) + "- " + node.get_name() + " (" + (node.get_children.length == 0 ? ("file, size=" + node.get_size().to_s) : "dir") + ")";
-
-    if (node.get_children.length != 0)
-        size = node.get_size();
-
-        if (size <= 100000)
-            @sizes = @sizes + node.get_size();
-        end
-    end
 
     # Print children
     node.get_children().each do |child|
@@ -126,8 +117,40 @@ def print_tree(node, level)
     end
 end
 
-root = create_tree_from_input;
+@sizes = 0;
+# Save tree globally so we can use it in functions later
+@root = create_tree_from_input;
 
-print_tree(root, 0);
+# We want to remove the smallest folder that gives enough space for the update
+@dir_to_delete = @root;
 
-puts(@sizes);
+# Function called for each node in tree in order to solve puzzle
+def process_node(node)
+    if (node.get_children.length != 0)
+        size = node.get_size();
+
+        if (size <= 100000)
+            @sizes = @sizes + node.get_size();
+        end
+
+        if (70000000 - @root.get_size + size >= 30000000 && size < @dir_to_delete.get_size)
+            @dir_to_delete = node;
+        end
+    end
+end
+
+# Traverse tree and complete puzzles
+def traverse_tree(node)
+    process_node(node)
+
+    # Traverse children
+    node.get_children().each do |child|
+        traverse_tree(child);
+    end
+end
+
+traverse_tree(@root);
+
+puts("Part 1: " + @sizes.to_s);
+
+puts("Part 2: " + @dir_to_delete.get_size.to_s);
