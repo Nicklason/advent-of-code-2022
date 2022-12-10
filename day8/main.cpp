@@ -8,7 +8,8 @@ void populateMatrix(std::vector<std::vector<int>> &);
 std::vector<int> getRow(std::vector<std::vector<int>>, int);
 std::vector<int> getColumn(std::vector<std::vector<int>>, int);
 bool isVisibleInRow(std::vector<int>, int);
-bool isVisible(std::vector<std::vector<int>>, int, int);
+int getVisibleTreesOnLeft(std::vector<int>, int);
+int getScore(std::vector<std::vector<int>>, int, int);
 
 int main()
 {
@@ -23,20 +24,43 @@ int main()
   // All outside trees can be seen
   int visible = rows * 2 + (columns - 2) * 2;
 
+  int highestScore = 0;
+
   // Loop through all inner trees and check if they can be seen
   for (int i = 1; i < vec.size() - 1; i++)
   {
     for (int j = 1; j < vec[i].size() - 1; j++)
     {
+      auto row = getRow(vec, i);
+      auto column = getColumn(vec, j);
+
       // Check if tree is visible from any direction
-      if (isVisible(vec, i, j))
+      if (isVisibleInRow(row, j) || isVisibleInRow(column, i))
       {
         visible++;
+      }
+
+      // Get the number of trees visible from each direction
+
+      // Get trees visible on left using row and column index
+      int treesVisibleLeft = getVisibleTreesOnLeft(row, j);
+      // Get trees visible on right by reversing the row and index
+      int treesVisibleRight = getVisibleTreesOnLeft(std::vector<int>(row.rbegin(), row.rend()), row.size() - j - 1);
+      // Get trees visible on top using column and row index
+      int treesVisibleTop = getVisibleTreesOnLeft(column, i);
+      // Get trees visible on bottom by reversing the column and index
+      int treesVisibleBottom = getVisibleTreesOnLeft(std::vector<int>(column.rbegin(), column.rend()), column.size() - i - 1);
+
+      int score = treesVisibleLeft * treesVisibleRight * treesVisibleTop * treesVisibleBottom;
+      if (score > highestScore)
+      {
+        highestScore = score;
       }
     }
   }
 
-  std::cout << visible << std::endl;
+  std::cout << "Part 1: " << visible << std::endl;
+  std::cout << "Part 2: " << highestScore << std::endl;
 
   return 0;
 }
@@ -83,7 +107,10 @@ void populateMatrix(std::vector<std::vector<int>> &vec)
 
 std::vector<int> getRow(std::vector<std::vector<int>> vec, int row)
 {
-  return vec[row];
+  // Create a copy of the row vector
+  std::vector<int> rowVec(vec.size());
+  rowVec = vec[row];
+  return rowVec;
 }
 
 std::vector<int> getColumn(std::vector<std::vector<int>> vec, int column)
@@ -98,9 +125,22 @@ std::vector<int> getColumn(std::vector<std::vector<int>> vec, int column)
   return columnVec;
 }
 
-bool isVisible(std::vector<std::vector<int>> vec, int row, int column)
+int getVisibleTreesOnLeft(std::vector<int> vec, int index)
 {
-  return isVisibleInRow(getRow(vec, row), column) || isVisibleInRow(getColumn(vec, column), row);
+  int distance = 0;
+
+  // Loop from right to left
+  // Check if tree is visible from right
+  for (int i = index - 1; i >= 0; i--)
+  {
+    distance++;
+    if (vec[i] >= vec[index])
+    {
+      break;
+    }
+  }
+
+  return distance;
 }
 
 bool isVisibleInRow(std::vector<int> vec, int index)
