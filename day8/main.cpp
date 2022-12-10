@@ -4,18 +4,16 @@
 #include <string>
 
 std::vector<std::vector<int>> createMatrix(int, int);
-int findTallestFromLeft(std::vector<std::vector<int>>, int, int);
-int findTallestFromRight(std::vector<std::vector<int>>, int, int);
-int findTallestFromTop(std::vector<std::vector<int>>, int, int);
-int findTallestFromBottom(std::vector<std::vector<int>>, int, int);
+bool isVisibleInRow(std::vector<std::vector<int>>, int, int);
+bool isVisibleInColumn(std::vector<std::vector<int>>, int, int);
 bool isVisible(std::vector<std::vector<int>>, int, int);
 
 int main()
 {
-  int row = 99;
-  int column = 99;
+  int rows = 99;
+  int columns = 99;
 
-  auto vec = createMatrix(row, column);
+  auto vec = createMatrix(rows, columns);
 
   // Populate the matrix
 
@@ -41,7 +39,7 @@ int main()
   input.close();
 
   // All outside trees can be seen
-  int visible = row * 2 + (column - 2) * 2;
+  int visible = rows * 2 + (columns - 2) * 2;
 
   // Loop through all inner trees and check if they can be seen
   for (int i = 1; i < vec.size() - 1; i++)
@@ -79,84 +77,69 @@ std::vector<std::vector<int>> createMatrix(int row, int column)
 
 bool isVisible(std::vector<std::vector<int>> vec, int row, int column)
 {
-  int size = vec[row][column];
-
-  if (findTallestFromLeft(vec, row, column) < size)
-  {
-    return true;
-  }
-  else if (findTallestFromRight(vec, row, column) < size)
-  {
-    return true;
-  }
-  else if (findTallestFromTop(vec, row, column) < size)
-  {
-    return true;
-  }
-  else if (findTallestFromBottom(vec, row, column) < size)
-  {
-    return true;
-  }
-
-  return false;
+  return isVisibleInRow(vec, row, column) || isVisibleInColumn(vec, row, column);
 }
 
-int findTallestFromLeft(std::vector<std::vector<int>> vec, int row, int column)
+bool isVisibleInRow(std::vector<std::vector<int>> vec, int row, int column)
 {
   int tallest = vec[row][0];
-  for (int k = 1; k < column; k++)
+
+  bool isVisible = false;
+
+  // Loop through all trees in the same row
+  for (int k = 1; k < vec[row].size(); k++)
   {
+    // Check if we reached the current tree
+    if (k == column)
+    {
+      // Check if tree is visible from left
+      if (vec[row][k] > tallest)
+      {
+        // Tree is visible, so we can skip the rest of the trees in the row
+        return true;
+      }
+
+      // Tree is not visible, reset tallest and continue to check from the right
+      tallest = 0;
+      continue;
+    }
+
+    // Check if tree is taller than the current tallest tree
     if (vec[row][k] > tallest)
     {
       tallest = vec[row][k];
     }
   }
 
-  return tallest;
+  // If we reached this point, the tree is not visible from the left
+  // Check if it is visible from the right
+  return vec[row][column] > tallest;
 }
 
-int findTallestFromRight(std::vector<std::vector<int>> vec, int row, int column)
-{
-  int columns = vec[row].size();
-
-  int tallest = vec[row][columns - 1];
-  for (int k = columns - 2; k > column; k--)
-  {
-    if (vec[row][k] > tallest)
-    {
-      tallest = vec[row][k];
-    }
-  }
-
-  return tallest;
-}
-
-int findTallestFromTop(std::vector<std::vector<int>> vec, int row, int column)
+bool isVisibleInColumn(std::vector<std::vector<int>> vec, int row, int column)
 {
   int tallest = vec[0][column];
-  for (int k = 1; k < row; k++)
+
+  // Loop through all trees in the same column
+  for (int k = 1; k < vec.size(); k++)
   {
+    if (k == row)
+    {
+      // Check if tree is visible from top
+      if (vec[k][column] > tallest)
+      {
+        return true;
+      }
+
+      tallest = 0;
+      continue;
+    }
+
     if (vec[k][column] > tallest)
     {
       tallest = vec[k][column];
     }
   }
 
-  return tallest;
-}
-
-int findTallestFromBottom(std::vector<std::vector<int>> vec, int row, int column)
-{
-  int rows = vec.size();
-
-  int tallest = vec[rows - 1][column];
-  for (int k = rows - 2; k > row; k--)
-  {
-    if (vec[k][column] > tallest)
-    {
-      tallest = vec[k][column];
-    }
-  }
-
-  return tallest;
+  return vec[row][column] > tallest;
 }
