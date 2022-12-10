@@ -4,8 +4,9 @@
 #include <string>
 
 std::vector<std::vector<int>> createMatrix(int, int);
-bool isVisibleInRow(std::vector<std::vector<int>>, int, int);
-bool isVisibleInColumn(std::vector<std::vector<int>>, int, int);
+std::vector<int> getRow(std::vector<std::vector<int>>, int);
+std::vector<int> getColumn(std::vector<std::vector<int>>, int);
+bool isVisibleInRow(std::vector<int>, int);
 bool isVisible(std::vector<std::vector<int>>, int, int);
 
 int main()
@@ -75,25 +76,43 @@ std::vector<std::vector<int>> createMatrix(int row, int column)
   return vec;
 }
 
-bool isVisible(std::vector<std::vector<int>> vec, int row, int column)
+std::vector<int> getRow(std::vector<std::vector<int>> vec, int row)
 {
-  return isVisibleInRow(vec, row, column) || isVisibleInColumn(vec, row, column);
+  return vec[row];
 }
 
-bool isVisibleInRow(std::vector<std::vector<int>> vec, int row, int column)
+std::vector<int> getColumn(std::vector<std::vector<int>> vec, int column)
 {
-  int tallest = vec[row][0];
+  std::vector<int> columnVec(vec.size());
+
+  for (int i = 0; i < vec.size(); i++)
+  {
+    columnVec[i] = vec[i][column];
+  }
+
+  return columnVec;
+}
+
+bool isVisible(std::vector<std::vector<int>> vec, int row, int column)
+{
+  return isVisibleInRow(getRow(vec, row), column) || isVisibleInRow(getColumn(vec, column), row);
+}
+
+bool isVisibleInRow(std::vector<int> vec, int index)
+{
+  int tallest = vec[0];
 
   bool isVisible = false;
 
-  // Loop through all trees in the same row
-  for (int k = 1; k < vec[row].size(); k++)
+  // Loop through row from left to right
+
+  for (int i = 1; i < vec.size(); i++)
   {
     // Check if we reached the current tree
-    if (k == column)
+    if (i == index)
     {
       // Check if tree is visible from left
-      if (vec[row][k] > tallest)
+      if (vec[i] > tallest)
       {
         // Tree is visible, so we can skip the rest of the trees in the row
         return true;
@@ -105,41 +124,13 @@ bool isVisibleInRow(std::vector<std::vector<int>> vec, int row, int column)
     }
 
     // Check if tree is taller than the current tallest tree
-    if (vec[row][k] > tallest)
+    if (vec[i] > tallest)
     {
-      tallest = vec[row][k];
+      tallest = vec[i];
     }
   }
 
   // If we reached this point, the tree is not visible from the left
   // Check if it is visible from the right
-  return vec[row][column] > tallest;
-}
-
-bool isVisibleInColumn(std::vector<std::vector<int>> vec, int row, int column)
-{
-  int tallest = vec[0][column];
-
-  // Loop through all trees in the same column
-  for (int k = 1; k < vec.size(); k++)
-  {
-    if (k == row)
-    {
-      // Check if tree is visible from top
-      if (vec[k][column] > tallest)
-      {
-        return true;
-      }
-
-      tallest = 0;
-      continue;
-    }
-
-    if (vec[k][column] > tallest)
-    {
-      tallest = vec[k][column];
-    }
-  }
-
-  return vec[row][column] > tallest;
+  return vec[index] > tallest;
 }
