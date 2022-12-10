@@ -4,6 +4,7 @@
 #include <string>
 
 std::vector<std::vector<int>> createMatrix(int, int);
+void populateMatrix(std::vector<std::vector<int>> &);
 std::vector<int> getRow(std::vector<std::vector<int>>, int);
 std::vector<int> getColumn(std::vector<std::vector<int>>, int);
 bool isVisibleInRow(std::vector<int>, int);
@@ -17,27 +18,7 @@ int main()
   auto vec = createMatrix(rows, columns);
 
   // Populate the matrix
-
-  // Create read stream
-  std::ifstream input("input.txt");
-
-  std::string line;
-
-  int lineIndex = 0;
-  // Read line by line
-  while (std::getline(input, line))
-  {
-    for (int i = 0; i < line.length(); i++)
-    {
-      vec[lineIndex][i] = (int)line[i] - 48;
-    }
-
-    // Add the line to the map
-    lineIndex++;
-  }
-
-  // Close the file
-  input.close();
+  populateMatrix(vec);
 
   // All outside trees can be seen
   int visible = rows * 2 + (columns - 2) * 2;
@@ -74,6 +55,30 @@ std::vector<std::vector<int>> createMatrix(int row, int column)
   }
 
   return vec;
+}
+
+void populateMatrix(std::vector<std::vector<int>> &vec)
+{
+  // Create read stream
+  std::ifstream input("input.txt");
+
+  std::string line;
+
+  int lineIndex = 0;
+  // Read line by line
+  while (std::getline(input, line))
+  {
+    for (int i = 0; i < line.length(); i++)
+    {
+      vec[lineIndex][i] = (int)line[i] - 48;
+    }
+
+    // Add the line to the map
+    lineIndex++;
+  }
+
+  // Close the file
+  input.close();
 }
 
 std::vector<int> getRow(std::vector<std::vector<int>> vec, int row)
