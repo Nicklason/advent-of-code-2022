@@ -8,6 +8,7 @@ int findTallestFromLeft(std::vector<std::vector<int>>, int, int);
 int findTallestFromRight(std::vector<std::vector<int>>, int, int);
 int findTallestFromTop(std::vector<std::vector<int>>, int, int);
 int findTallestFromBottom(std::vector<std::vector<int>>, int, int);
+bool isVisible(std::vector<std::vector<int>>, int, int);
 
 int main()
 {
@@ -48,19 +49,7 @@ int main()
     for (int j = 1; j < vec[i].size() - 1; j++)
     {
       // Check if tree is visible from any direction
-      if (findTallestFromLeft(vec, i, j) < vec[i][j])
-      {
-        visible++;
-      }
-      else if (findTallestFromRight(vec, i, j) < vec[i][j])
-      {
-        visible++;
-      }
-      else if (findTallestFromTop(vec, i, j) < vec[i][j])
-      {
-        visible++;
-      }
-      else if (findTallestFromBottom(vec, i, j) < vec[i][j])
+      if (isVisible(vec, i, j))
       {
         visible++;
       }
@@ -86,6 +75,30 @@ std::vector<std::vector<int>> createMatrix(int row, int column)
   }
 
   return vec;
+}
+
+bool isVisible(std::vector<std::vector<int>> vec, int row, int column)
+{
+  int size = vec[row][column];
+
+  if (findTallestFromLeft(vec, row, column) < size)
+  {
+    return true;
+  }
+  else if (findTallestFromRight(vec, row, column) < size)
+  {
+    return true;
+  }
+  else if (findTallestFromTop(vec, row, column) < size)
+  {
+    return true;
+  }
+  else if (findTallestFromBottom(vec, row, column) < size)
+  {
+    return true;
+  }
+
+  return false;
 }
 
 int findTallestFromLeft(std::vector<std::vector<int>> vec, int row, int column)
