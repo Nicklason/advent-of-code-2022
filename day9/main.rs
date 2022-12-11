@@ -17,10 +17,6 @@ fn main() -> io::Result<()> {
     let mut tailVisitedPositions = HashSet::new();
     let mut secondKnotVisitedPositions = HashSet::new();
 
-    // Add start position to set
-    tailVisitedPositions.insert((0, 0));
-    secondKnotVisitedPositions.insert((0, 0));
-
     // Read each line of the file and move the head and tail accordingly
     for line in reader.lines() {
         let line = line?;
