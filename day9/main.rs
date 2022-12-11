@@ -22,19 +22,17 @@ fn main() -> io::Result<()> {
         let line = line?;
 
         // Get direction and steps from line
-        let direction = line.chars().nth(0).unwrap();
-        let steps = &line[2..].parse::<i32>().unwrap();
 
-        let (x, y) = match direction {
-            'U' => (0, 1),
-            'D' => (0, -1),
-            'L' => (-1, 0),
-            'R' => (1, 0),
+        let (x, y, steps) = match line.split_at(2) {
+            ("U ", n) => (0, 1, n),
+            ("D ", n) => (0, -1, n),
+            ("L ", n) => (-1, 0, n),
+            ("R ", n) => (1, 0, n),
             _ => unreachable!()
         };
 
         // Loop through each step
-        for _ in 0..*steps {
+        for _ in 0..steps.parse::<i32>().unwrap() {
             // Move head in direction
             knots[0].0 += x;
             knots[0].1 += y;
