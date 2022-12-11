@@ -25,16 +25,19 @@ fn main() -> io::Result<()> {
         let direction = line.chars().nth(0).unwrap();
         let steps = &line[2..].parse::<i32>().unwrap();
 
+        let (x, y) = match direction {
+            'U' => (0, 1),
+            'D' => (0, -1),
+            'L' => (-1, 0),
+            'R' => (1, 0),
+            _ => unreachable!()
+        };
+
         // Loop through each step
         for _ in 0..*steps {
             // Move head in direction
-            match direction {
-                'U' => knots[0].1 += 1,
-                'D' => knots[0].1 -= 1,
-                'L' => knots[0].0 -= 1,
-                'R' => knots[0].0 += 1,
-                _ => println!("Unknown direction")
-            }
+            knots[0].0 += x;
+            knots[0].1 += y;
 
             // Loop through each knot
             for i in 1..knots.len() {
