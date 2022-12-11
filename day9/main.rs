@@ -2,12 +2,14 @@ use std::fs::File;
 use std::io::{self, prelude::*, BufReader};
 use std::collections::HashSet;
 
+type Pos = (i32, i32);
+
 fn main() -> io::Result<()> {
     let file = File::open("input.txt")?;
     let reader = BufReader::new(file);
 
     // Create array to store multiple knots
-    let mut knots: Vec<(i32, i32)> = Vec::new();
+    let mut knots: Vec<Pos> = Vec::new();
 
     // Create 10 knots and add to array
     for _ in 0..10 {
@@ -39,19 +41,8 @@ fn main() -> io::Result<()> {
 
             // Loop through each knot
             for i in 1..knots.len() {
-                let diffX = (knots[i - 1].0 - knots[i].0).abs();
-                let diffY = (knots[i - 1].1 - knots[i].1).abs();
-
-                // If head and tail are 3 or more apart then move the tail in both the x and y direction
-                if diffX + diffY >= 3 {
-                    knots[i].0 += if knots[i - 1].0 > knots[i].0 { 1 } else { -1 };
-                    knots[i].1 += if knots[i - 1].1 > knots[i].1 { 1 } else { -1 };
-                // If difference in x is greater than 1 then move the tail in the correct x direction
-                } else if diffX == 2 {
-                    knots[i].0 += if knots[i - 1].0 > knots[i].0 { 1 } else { -1 };
-                // If the difference in y is greater than 1 then move the tail in the correct y direction
-                } else if diffY == 2 {
-                    knots[i].1 += if knots[i - 1].1 > knots[i].1 { 1 } else { -1 };
+                if let Some(newTail) = move_knot(&knots[i - 1], &knots[i]) {
+                    knots[i] = newTail;
                 } else {
                     break;
                 }
@@ -68,4 +59,22 @@ fn main() -> io::Result<()> {
     println!("Part 2: {}", tailVisitedPositions.len());
 
     Ok(())
+}
+
+fn move_knot(head: &Pos, tail: &Pos) -> Option<Pos> {
+    let diffX = (head.0 - tail.0).abs();
+    let diffY = (head.1 - tail.1).abs();
+
+    // If head and tail are 3 or more apart then move the tail in both the x and y direction
+    if diffX + diffY >= 3 {
+        Some((tail.0 + if head.0 > tail.0 { 1 } else { -1 }, tail.1 + if head.1 > tail.1 { 1 } else { -1 }))
+    // If difference in x is greater than 1 then move the tail in the correct x direction
+    } else if diffX == 2 {
+        Some((tail.0 + if head.0 > tail.0 { 1 } else { -1 }, tail.1))
+    // If the difference in y is greater than 1 then move the tail in the correct y direction
+    } else if diffY == 2 {
+        Some((tail.0, tail.1 + if head.1 > tail.1 { 1 } else { -1 }))
+    } else {
+        None
+    }
 }
