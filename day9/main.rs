@@ -6,14 +6,20 @@ fn main() -> io::Result<()> {
     let file = File::open("input.txt")?;
     let reader = BufReader::new(file);
 
+    // Create array to store multiple knots
+    let mut knots: Vec<(i32, i32)> = Vec::new();
+
+    // Create 10 knots and add to array
+    for _ in 0..10 {
+        knots.push((0,0));
+    }
+
     let mut tailVisitedPositions = HashSet::new();
-    let mut headX: i32 = 0;
-    let mut headY: i32 = 0;
-    let mut tailX = headX;
-    let mut tailY = headY;
+    let mut secondKnotVisitedPositions = HashSet::new();
 
     // Add start position to set
-    tailVisitedPositions.insert((tailX, tailY));
+    tailVisitedPositions.insert((0, 0));
+    secondKnotVisitedPositions.insert((0, 0));
 
     // Read each line of the file and move the head and tail accordingly
     for line in reader.lines() {
@@ -23,58 +29,46 @@ fn main() -> io::Result<()> {
         let direction = line.chars().nth(0).unwrap();
         let steps = &line[2..].parse::<i32>().unwrap();
 
-        // Loop through each steps
-        let mut i: i32 = -1;
-        while i < steps - 1 {
-            i += 1;
-
+        // Loop through each step
+        for _ in 0..*steps {
             // Move head in direction
             match direction {
-                'U' => headY += 1,
-                'D' => headY -= 1,
-                'L' => headX -= 1,
-                'R' => headX += 1,
+                'U' => knots[0].1 += 1,
+                'D' => knots[0].1 -= 1,
+                'L' => knots[0].0 -= 1,
+                'R' => knots[0].0 += 1,
                 _ => println!("Unknown direction")
             }
 
-            let diffX = (headX - tailX).abs();
-            let diffY = (headY - tailY).abs();
+            // Loop through each knot
+            for i in 1..knots.len() {
+                let diffX = (knots[i - 1].0 - knots[i].0).abs();
+                let diffY = (knots[i - 1].1 - knots[i].1).abs();
 
-            // If head and tail are 3 apart then move the tail in both the x and y direction
-            if diffX + diffY == 3 {
-                if headX > tailX {
-                    tailX += 1;
+                // If head and tail are 3 or more apart then move the tail in both the x and y direction
+                if diffX + diffY >= 3 {
+                    knots[i].0 += if knots[i - 1].0 > knots[i].0 { 1 } else { -1 };
+                    knots[i].1 += if knots[i - 1].1 > knots[i].1 { 1 } else { -1 };
+                // If difference in x is greater than 1 then move the tail in the correct x direction
+                } else if diffX == 2 {
+                    knots[i].0 += if knots[i - 1].0 > knots[i].0 { 1 } else { -1 };
+                // If the difference in y is greater than 1 then move the tail in the correct y direction
+                } else if diffY == 2 {
+                    knots[i].1 += if knots[i - 1].1 > knots[i].1 { 1 } else { -1 };
                 } else {
-                    tailX -= 1;
-                }
-
-                if headY > tailY {
-                    tailY += 1;
-                } else {
-                    tailY -= 1;
-                }
-            // If difference in x is greater than 1 then move the tail in the correct x direction
-            } else if diffX > 1 {
-                if headX > tailX {
-                    tailX += 1;
-                } else {
-                    tailX -= 1;
-                }
-            // If the difference in y is greater than 1 then move the tail in the correct y direction
-            } else if diffY > 1 {
-                if headY > tailY {
-                    tailY += 1;
-                } else {
-                    tailY -= 1;
+                    break;
                 }
             }
 
             // Add tail position to set
-            tailVisitedPositions.insert((tailX, tailY));
+            secondKnotVisitedPositions.insert(knots[1]);
+            tailVisitedPositions.insert(knots[9]);
         }
     }
 
-    println!("{}", tailVisitedPositions.len());
+    println!("Part 1: {}", secondKnotVisitedPositions.len());
+
+    println!("Part 2: {}", tailVisitedPositions.len());
 
     Ok(())
 }
