@@ -8,13 +8,8 @@ fn main() -> io::Result<()> {
     let file = File::open("input.txt")?;
     let reader = BufReader::new(file);
 
-    // Create array to store multiple knots
-    let mut knots: Vec<Pos> = Vec::new();
-
-    // Create 10 knots and add to array
-    for _ in 0..10 {
-        knots.push((0,0));
-    }
+    // Create array to store multiple knots and initialize it with the starting positions
+    let mut knots: Vec<Pos> = vec![((0, 0)); 10];
 
     let mut tailVisitedPositions = HashSet::new();
     let mut secondKnotVisitedPositions = HashSet::new();
