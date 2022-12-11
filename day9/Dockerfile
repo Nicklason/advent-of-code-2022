@@ -4,8 +4,6 @@ WORKDIR /usr/app
 
 COPY main.rs input.txt ./
 
-# CMD ["rustc", "--explain", "E0689"]
-
 RUN rustc main.rs
 
 CMD ["./main"]

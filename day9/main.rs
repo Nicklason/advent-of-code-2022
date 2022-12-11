@@ -36,8 +36,8 @@ fn main() -> io::Result<()> {
 
             // Loop through each knot
             for i in 1..knots.len() {
-                if let Some(newTail) = move_knot(&knots[i - 1], &knots[i]) {
-                    knots[i] = newTail;
+                if let Some(newPos) = move_knot(&knots[i - 1], &knots[i]) {
+                    knots[i] = newPos;
                 } else {
                     break;
                 }
@@ -57,19 +57,17 @@ fn main() -> io::Result<()> {
 }
 
 fn move_knot(head: &Pos, tail: &Pos) -> Option<Pos> {
-    let diffX = (head.0 - tail.0).abs();
-    let diffY = (head.1 - tail.1).abs();
+    let (diffX, diffY) = (tail.0 - head.0, tail.1 - head.1);
+    let (diffX1, diffY1) = (diffX.clamp(-1, 1), diffY.clamp(-1, 1));
 
-    // If head and tail are 3 or more apart then move the tail in both the x and y direction
-    if diffX + diffY >= 3 {
-        Some((tail.0 + if head.0 > tail.0 { 1 } else { -1 }, tail.1 + if head.1 > tail.1 { 1 } else { -1 }))
-    // If difference in x is greater than 1 then move the tail in the correct x direction
-    } else if diffX == 2 {
-        Some((tail.0 + if head.0 > tail.0 { 1 } else { -1 }, tail.1))
-    // If the difference in y is greater than 1 then move the tail in the correct y direction
-    } else if diffY == 2 {
-        Some((tail.0, tail.1 + if head.1 > tail.1 { 1 } else { -1 }))
-    } else {
-        None
-    }
+    return match (diffX.abs() == 2, diffY.abs() == 2) {
+        // If difference in x and y is 2, move both x and y
+        (true, true) => Some((head.0 + diffX1, head.1 + diffY1)),
+        // If difference in x is 2 then move the tail in the correct x direction
+        (true, false) => Some((head.0 + diffX1, head.1)),
+        // If the difference in y is 2 then move the tail in the correct y direction
+        (false, true) => Some((head.0, head.1 + diffY1)),
+        // Don't move
+        _ => None,
+    };
 }
