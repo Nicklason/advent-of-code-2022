@@ -31,6 +31,10 @@ while(my $line = <$info>) {
         if (($cycles - 20) % 40 eq 0) {
             $strength += $cycles * $x;
         }
+
+        my $pixel = ($cycles - 1) % 40;
+        print abs $pixel - $x <= 1 ? '#' : ' ';
+        say '' if $pixel == 39;
     }
 
     if ($command eq 'addx') {
@@ -40,4 +44,4 @@ while(my $line = <$info>) {
 
 close $info;
 
-say $strength;
+say "Part 1: $strength";
